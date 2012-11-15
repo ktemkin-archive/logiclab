@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#get the basic path information regarding the VHD file
+modname=$(basename $1 .vhd)
+dirname=$(dirname $1)
+
+#convert the VHDL file to a SPL I/O specification
+#TODO: do this myself; the Xilinx tools are _horrible_ at it
+vhdtdtfi -lib work "$dirname/$modname.vhd" -prj gencombo -o "$dirname/$modname.spl" -module $modname -template /opt/Xilinx/14.1/ISE_DS/ISE//data/splfile.tft -deleteonerror 
+
+#convert the SPL spec to a schematic symbol
+spl2sym -intstyle ise -family spartan3e "$dirname/$modname.spl" "$dirname/$modname.sym"
+
+#zip the VHD and SYM files
+zip -Dr generated.zip "$dirname/$modname.spl" "$dirname/$modname.sym"
+
+#remove the intermediary files
+rm "$dirname/$modname.spl"
+rm "$dirname/$modname.sym"
