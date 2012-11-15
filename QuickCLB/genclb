@@ -1,0 +1,39 @@
+#!/usr/bin/env python2
+
+import sys
+import argparse
+import code_builder
+
+from boolean_algebra import CombinationalLogicBlock
+
+def with_next(lst):
+    """
+        Iterates over a given list, providing an easy reference to the next element.
+    """
+    
+    #iterate over each pair of values in the list...
+    for i in range(len(lst) - 1):
+        yield lst[i:i + 2]
+
+    #then, iterate over just the last element, with no successor
+    yield lst[i], None
+
+
+def main():
+
+    #Enumerate the command line arguments, to automate argument parsing.
+    parser = argparse.ArgumentParser(description='Converts a Boolean Algebra expression to another language for easy implementation')
+    parser.add_argument('--sym', '-s', action='store_true', help='If provided, a Schematic Symbol will be generated as well.')
+    parser.add_argument('eqfile', nargs='?', metavar='equation_file', type=open, default=sys.stdin, help='The file which contains one or more Boolean equations.')
+    
+    #Parse the command line arguments.
+    args = parser.parse_args()
+
+    clb = CombinationalLogicBlock.from_boolean_algebra(args.eqfile)
+    print clb.to_VHDL('somefunc')
+
+
+#if this file was called directly, run main()
+if __name__ == '__main__':
+    main()
+
